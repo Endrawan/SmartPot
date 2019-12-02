@@ -13,10 +13,11 @@
 #define WIFI_PASSWORD "nadi30041999"
 
 int humidity;
-bool wateringStatus;
+bool wateringStatus = false;
 
 void updateHumidity(int);
 bool getWateringStatus();
+bool setWateringStatus(bool);
 void wateringThePlants(int);
 
 void setup() {
@@ -42,60 +43,10 @@ void setup() {
 void loop() {
   // Get sensor value
   humidity = map(analogRead(SOIL_SENSOR), 1023, 0, 0, 100);
+  wateringStatus = getWateringStatus();
   updateHumidity(humidity);
   wateringThePlants(humidity);
   delay(1000);
-
-  // update value
-  //  Firebase.setFloat("number", 43.0);
-  //  // handle error
-  //  if (Firebase.failed()) {
-  //      Serial.print("setting /number failed:");
-  //      Serial.println(Firebase.error());
-  //      return;
-  //  }
-  //  delay(1000);
-  //
-  //  // get value
-  //  Serial.print("number: ");
-  //  Serial.println(Firebase.getFloat("number"));
-  //  delay(1000);
-  //
-  //  // remove value
-  //  Firebase.remove("number");
-  //  delay(1000);
-  //
-  //  // set string value
-  //  Firebase.setString("message", "hello world");
-  //  // handle error
-  //  if (Firebase.failed()) {
-  //      Serial.print("setting /message failed:");
-  //      Serial.println(Firebase.error());
-  //      return;
-  //  }
-  //  delay(1000);
-  //
-  //  // set bool value
-  //  Firebase.setBool("truth", false);
-  //  // handle error
-  //  if (Firebase.failed()) {
-  //      Serial.print("setting /truth failed:");
-  //      Serial.println(Firebase.error());
-  //      return;
-  //  }
-  //  delay(1000);
-  //
-  //  // append a new value to /logs
-  //  String name = Firebase.pushInt("logs", n++);
-  //  // handle error
-  //  if (Firebase.failed()) {
-  //      Serial.print("pushing /logs failed:");
-  //      Serial.println(Firebase.error());
-  //      return;
-  //  }
-  //  Serial.print("pushed: /logs/");
-  //  Serial.println(name);
-  //  delay(1000);
 }
 
 void updateHumidity(int humidity) {
@@ -110,13 +61,30 @@ void updateHumidity(int humidity) {
   }
 }
 
-void getWateringStatus()
+bool getWateringStatus() {
+  bool status = Firebase.getBool("wateringStatus");
+  Serial.print("WateringStatus: ");
+  Serial.println(status); 
+  return status;
+}
+
+bool setWateringStatus(bool status) {
+  Firebase.setBool("wateringStatus", status);
+  if (Firebase.failed()) {
+    Serial.print("Update wateringStatus to Firebase failed:");
+    Serial.println(Firebase.error());
+    setWateringStatus(status);
+  } else {
+    Serial.println("Update wateringStatus to Firebase successful");
+  }
+}
 
 void wateringThePlants(int humidity) {
- if(humidity <= HUMIDITY_BOUNDS) {
+ if(humidity <= HUMIDITY_BOUNDS || wateringStatus) {
     Serial.println("Watering...");
     digitalWrite(WATERING_ACTUATOR, HIGH);
     delay(WATERING_TIME);
     digitalWrite(WATERING_ACTUATOR, LOW);
+    setWateringStatus(false);
   }
 }
