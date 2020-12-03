@@ -7,10 +7,10 @@
 #define HUMIDITY_BOUNDS 30
 #define WATERING_TIME 2000
 
-#define FIREBASE_HOST "smartpot-42167.firebaseio.com"
-#define FIREBASE_AUTH "o4kWDyvAIPkBDH0FjO1L2RiTz8XgxfDKDhzrK0AH"
-#define WIFI_SSID "Redmi"
-#define WIFI_PASSWORD "nadi30041999"
+#define FIREBASE_HOST "<your-firebase-host-here>"
+#define FIREBASE_AUTH "<your-firebase-auth-here>"
+#define WIFI_SSID "<wifi-name>"
+#define WIFI_PASSWORD "<wifi-password>"
 
 int humidity;
 bool wateringStatus = false;
